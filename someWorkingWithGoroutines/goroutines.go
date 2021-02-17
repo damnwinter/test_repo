@@ -15,7 +15,7 @@ type coin struct {
 }
 
 func (c coin) String() string {
-	return fmt.Sprintf("%s:\n  Yesterday:  %s\n  Today:      %s", c.Name, c.YesterdayVal, c.CurrentValue)
+	return fmt.Sprintf("%s:\n  Yesterday:  %s\n  Today:      %s\n", c.Name, c.YesterdayVal, c.CurrentValue)
 }
 
 func main() {
@@ -48,7 +48,13 @@ func main() {
 		YesterdayVal: matches[0],
 		CurrentValue: matches[1],
 	}
+	eur := coin{
+		Name: "EUR",
+		YesterdayVal: matches[2],
+		CurrentValue: matches[3],
+	}
 	fmt.Println(usb)
+	fmt.Println(eur)
 
 	return
 }
