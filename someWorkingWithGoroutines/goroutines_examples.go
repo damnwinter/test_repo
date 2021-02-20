@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"sync/atomic"
 )
@@ -67,4 +68,36 @@ func rightUseRightOrder() {
 		}()
 	}
 	wg.Wait()
+}
+
+func anotherRight() {
+	ch := make(chan int)
+	waitG := sync.WaitGroup{}
+
+	done := make(chan bool)
+	go func() {
+		for i := 0; i < 5; i++ {
+			waitG.Add(1)
+			go func(i int, ch chan int) {
+				ch <- i
+				waitG.Done()
+			}(i, ch)
+		}
+		waitG.Wait()
+
+		done <- true
+	}()
+	defer close(ch)
+	defer close(done)
+	for {
+		select {
+		case val := <- ch:
+			fmt.Println(val)
+
+		case <-done:
+			fmt.Println("Done")
+			os.Exit(1)
+		}
+	}
+
 }
