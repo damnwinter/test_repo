@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 )
 type Coin interface {
 	String() string
@@ -45,22 +46,40 @@ func (c coinV2) String() string {
 
 func main() {
 
-	coins, err := GetCoin()
-	if err != nil {
-		fmt.Println(err)
-	}
+	var wg sync.WaitGroup
+
+
+	var coins []coin
+	var coinsV2 []coinV2
+
+	wg.Add(1)
+	go func() {
+		var err error
+		coins, err = GetCoin()
+		if err != nil {
+			fmt.Println(err)
+		}
+		wg.Done()
+	}()
+
+
+	wg.Add(1)
+	go func() {
+		var err error
+		coinsV2, err = GetAllCoins()
+		if err != nil {
+			fmt.Println(err)
+		}
+		wg.Done()
+	}()
+	wg.Wait()
+
 	for _, coin := range coins {
 		fmt.Println(coin)
-	}
-
-	coinsV2, err := GetAllCoins()
-	if err != nil {
-		fmt.Println(err)
 	}
 	for _, coin := range coinsV2 {
 		fmt.Println(coin)
 	}
-
 
 	return
 }
