@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"sync"
 	"sync/atomic"
 )
@@ -32,14 +31,16 @@ func workerool() {
 	ch := make(chan struct{}, goroutinesNum)
 
 	// Some very big value
-	allValues := int32(10000000)
+	allWorks := int32(10000000)
 
 	var ind int32
-	for ind = 0; ind < allValues; {
+	for ind = 0; ind < allWorks; {
 		go func() {
 			ch <- struct{}{}
 			// some work for worker
-			atomic.AddInt32(&ind, 1)
+
+
+
 			<- ch
 		}()
 	}
@@ -121,7 +122,8 @@ func anotherRight() {
 
 		case <-done:
 			fmt.Println("Done")
-			os.Exit(1)
+			//os.Exit(1)
+			return
 		}
 	}
 
