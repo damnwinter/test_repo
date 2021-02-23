@@ -20,6 +20,31 @@ func main() {
 
 	fmt.Println("Or this one too!")
 	anotherRight()
+
+
+	fmt.Println("Worker pool")
+	workerool()
+}
+
+func workerool() {
+
+	goroutinesNum := 20
+	ch := make(chan struct{}, goroutinesNum)
+
+	// Some very big value
+	allValues := int32(10000000)
+
+	var ind int32
+	for ind = 0; ind < allValues; {
+		go func() {
+			ch <- struct{}{}
+			// some work for worker
+			atomic.AddInt32(&ind, 1)
+			<- ch
+		}()
+	}
+	fmt.Println(ind)
+
 }
 
 func wrongUse() {
