@@ -1,26 +1,46 @@
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+
 	fmt.Println("Worker pool")
-	workerool()
-}
+	jobsCount := 10
+	jobs := make(chan int, jobsCount)
+	jobsOut := make(chan int, jobsCount)
 
-func workerool() {
-
-	goroutinesNum := 20
-	ch := make(chan struct{}, goroutinesNum)
-
-	// Some very big value
-	allWorks := int32(10000000)
-
-	var ind int32
-	for ind = 0; ind < allWorks; {
-		go func() {
-			ch <- struct{}{}
-			// some work for worker
-
-
-
-			<- ch
-		}()
+	for i := 0; i < jobsCount; i++ {
+		jobs <- i
 	}
-	fmt.Println(ind)
+	close(jobs)
+
+
+	wg := sync.WaitGroup{}
+	go func() {
+		workerCount := 3
+		for i := 0; i < workerCount; i ++ {
+			wg.Add(1)
+			go worker(i + 1, jobs, jobsOut, &wg)
+		}
+		wg.Wait()
+		close(jobsOut)
+	}()
+
+	for out := range jobsOut {
+		fmt.Println("Jobs output: ", out)
+	}
 
 }
+
+func worker(id int, jobs chan int, jobsOut chan int, group *sync.WaitGroup) {
+	for val := range jobs {
+		fmt.Printf("Worker %d start job\n", id)
+		jobsOut <- val
+		fmt.Printf("Worker %d done job\n", id)
+	}
+	group.Done()
+}
+
