@@ -20,6 +20,7 @@ func TestSum(t *testing.T) {
     funcSum := Sum(oneTest.values)
     if funcSum != oneTest.sum {
       //some error log
+      t.Error("Expected ", oneTest.sum, ", but got", funcSum)
     }
   }
 
